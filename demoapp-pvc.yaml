@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: demoapp-pv
+spec:
+  capacity:
+    storage: 8G
+  accessModes:
+    - ReadOnlyMany
+  storageClassName: ""  
+  gcePersistentDisk:
+    pdName: demoapp-disk
+    fsType: ext4
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: demoapp-pv-claim
+spec:
+  volumeName: demoapp-pv
+  storageClassName: ""
+  accessModes:
+    - ReadOnlyMany
+  resources:
+    requests:
+      storage: 8G

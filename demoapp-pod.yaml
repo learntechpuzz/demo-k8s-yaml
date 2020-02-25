@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: demoapp-pod
+  labels:
+    app: demoapp
+spec:
+  containers:
+  - name: demoapp-container
+    image: learntechpuzz/demoapp
+    ports:
+      - containerPort: 80

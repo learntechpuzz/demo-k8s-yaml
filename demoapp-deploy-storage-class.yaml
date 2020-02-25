@@ -1,0 +1,63 @@
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: faster
+provisioner: kubernetes.io/gce-pd
+parameters:
+  type: pd-ssd
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: demoapp-pv-claim
+spec:
+  storageClassName: faster
+  accessModes:
+    - ReadOnlyMany
+  resources:
+    requests:
+      storage: 6Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demoapp-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: demoapp
+  template:
+    metadata:
+      name: demoapp-pod
+      labels:
+        app: demoapp
+    spec:
+      containers:
+      - name: demoapp-container
+        image: learntechpuzz/demoapp
+        ports:
+          - containerPort: 80
+        volumeMounts:
+          - mountPath: "/var/www/html"
+            name: demoapp-pvc-storage   
+            readOnly: true
+      volumes:
+        - name: demoapp-pvc-storage
+          persistentVolumeClaim:
+            claimName: demoapp-pv-claim  
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: demoapp-svc-lb
+spec:
+  selector:
+    app: demoapp
+  type: LoadBalancer  
+  ports:
+    - port: 80
+      targetPort: 80
+---
+      
